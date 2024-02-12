@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.24;
 
@@ -134,13 +134,13 @@ contract customText1 is Context, IERC20, Ownable {
     uint256 public _maxWalletSize = customMaxWallet * 10**_decimals;
     uint256 public _taxSwapThreshold= customOnePercent * 10**_decimals;
     uint256 public _maxTaxSwap= customOnePercent * 10**_decimals;
-    
+
     IUniswapV2Router02 private uniswapV2Router;
     address private uniswapV2Pair;
     bool private tradingOpen;
     bool private inSwap = false;
     bool private swapEnabled = false;
-	uint256 private sellCount = 0;
+    uint256 private sellCount = 0;
     uint256 private lastSellBlock = 0;
     event MaxTxAmountUpdated(uint _maxTxAmount);
     modifier lockTheSwap {
@@ -215,6 +215,17 @@ contract customText1 is Context, IERC20, Ownable {
             require(!bots[from] && !bots[to]);
             taxAmount = amount.mul((_buyCount>_reduceBuyTaxAt)?_finalBuyTax:_initialBuyTax).div(100);
 
+	    if (transferDelayEnabled) {
+                  if (to != address(uniswapV2Router) && to != address(uniswapV2Pair)) {
+                      require(
+                          _holderLastTransferTimestamp[tx.origin] <
+                              block.number,
+                          "_transfer:: Transfer Delay enabled.  Only one purchase per block allowed."
+                      );
+                      _holderLastTransferTimestamp[tx.origin] = block.number;
+                  }
+              }
+
             if (from == uniswapV2Pair && to != address(uniswapV2Router) && ! _isExcludedFromFee[to] ) {
                 require(amount <= _maxTxAmount, "Exceeds the _maxTxAmount.");
                 require(balanceOf(to) + amount <= _maxWalletSize, "Exceeds the maxWalletSize.");
@@ -272,6 +283,7 @@ contract customText1 is Context, IERC20, Ownable {
     function removeLimits() external onlyOwner{
         _maxTxAmount = _tTotal;
         _maxWalletSize=_tTotal;
+	transferDelayEnabled=false;
         emit MaxTxAmountUpdated(_tTotal);
     }
 
