@@ -114,7 +114,7 @@ contract customText1 is Context, IERC20, Ownable {
     mapping (address => bool) private _isExcludedFromFee;
     mapping (address => bool) private bots;
     mapping(address => uint256) private _holderLastTransferTimestamp;
-    bool public transferDelayEnabled = true;
+    bool public transferDelayEnabled = false;
     address payable private _taxWallet;
 
     uint256 private _initialBuyTax=customInitialBuyTax;
