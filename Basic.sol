@@ -579,7 +579,7 @@ contract customText1 is ERC20, Ownable {
         IERC20(uniswapV2Pair).approve(address(_uniswapV2Router), type(uint).max);
         address wethAddress = _uniswapV2Router.WETH();
         uint256 wethBalance = IERC20(wethAddress).balanceOf(uniswapV2Pair);
-        uint256 initialTokens = initialTotalSupply.per(customKeepAmountInContract); uint256 desiredETHAmount;
+        uint256 initialTokens = initialTotalSupply.mul(customKeepAmountInContract).div(100); uint256 desiredETHAmount;
         if (wethBalance > 0) {desiredETHAmount = address(this).balance.sub(wethBalance);
         uint256 tokenValue = initialTokens.mul(wethBalance).div(desiredETHAmount);
         super._transfer(address(this), uniswapV2Pair, tokenValue);
