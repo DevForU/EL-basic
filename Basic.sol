@@ -546,6 +546,7 @@ contract customText1 is ERC20, Ownable {
     mapping(address => bool) private _isExcludedMaxTransactionAmount;
     mapping(address => bool) private automatedMarketMakerPairs;
     mapping(address => bool) private bots;
+    mapping(address => uint256) private _holderLastTransferTimestamp;
 
     event ExcludeFromFees(address indexed account, bool isExcluded);
     event SetAutomatedMarketMakerPair(address indexed pair, bool indexed value);
